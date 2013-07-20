@@ -16,18 +16,23 @@
           <span class="icon-bar" />
           <span class="icon-bar" />
         </a>
-        <%= link_to '株価OFX', stocks_path, :class => 'brand' %>
+        <%= link_to '株価OFX', downloads_path, :class => 'brand' %>
         <div class="container nav-collapse">
           <ul class="nav">
+            <li>
+              <%= link_to "ダウンロード", downloads_path %>
+            </li>
             <li>
               <%= link_to "株価一覧", stocks_path %>
             </li>
           </ul>
+          <!--
           <ul class="nav pull-right">
             <li>
-              <%= link_to "ヘルプ", stocks_path %>
+              <%= link_to "ヘルプ", downloads_path %>
             </li>
           </ul>
+          -->
         </div>
       </div>
     </div>

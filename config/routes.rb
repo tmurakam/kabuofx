@@ -1,5 +1,5 @@
 Kabuofx::Application.routes.draw do
-  get "downloads/index"
+  get "downloads" => "downloads#index"
 
   resources :stocks, :only => [:index]
 

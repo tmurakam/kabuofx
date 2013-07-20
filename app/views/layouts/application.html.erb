@@ -1,14 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-  <title>Kabuofx</title>
+  <meta charset="utf-8">
+  <title>KabuOFX</title>
   <%= stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true %>
   <%= javascript_include_tag "application", "data-turbolinks-track" => true %>
   <%= csrf_meta_tags %>
 </head>
 <body>
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="btn btn-navbar" data-target=".nav-collapse" data-toggle="collapse">
+          <span class="icon-bar" />
+          <span class="icon-bar" />
+          <span class="icon-bar" />
+        </a>
+        <%= link_to '株価OFX', stocks_path, :class => 'brand' %>
+        <div class="container nav-collapse">
+          <ul class="nav">
+            <li>
+              <%= link_to "株価一覧", stocks_path %>
+            </li>
+          </ul>
+          <ul class="nav pull-right">
+            <li>
+              <%= link_to "ヘルプ", stocks_path %>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<%= yield %>
-
+  <div class="container">
+    <div class="row">
+      <div class="span12">
+        <% if flash[:notice] %>
+          <div id="notice" class="alert alert-success">
+            <%= flash[:notice] %>
+          </div>
+        <% end %>
+        <% if flash[:error] %>
+          <div id="error" class="alert alert-error">
+            <%= flash[:error] %>
+          </div>
+        <% end %>
+        <%= yield %>
+      </div>
+    </div>
+    <footer>
+      <p>Copyright &copy; 2013, Takuya Murakami</p>
+    </footer>
+  </div>
 </body>
 </html>

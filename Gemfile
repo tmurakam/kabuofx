@@ -47,6 +47,8 @@ gem 'bootstrap-sass'
 gem 'simple_form'
 gem 'kaminari'
 
+gem 'builder'
+
 group :test, :development do
   gem 'rspec-rails'
   gem 'factory_girl_rails'

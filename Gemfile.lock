@@ -209,6 +209,7 @@ DEPENDENCIES
   bcrypt-ruby (~> 3.0.0)
   better_errors
   bootstrap-sass
+  builder
   capistrano
   coffee-rails (~> 4.0.0)
   debugger

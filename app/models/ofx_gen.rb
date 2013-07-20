@@ -2,6 +2,16 @@
 require 'builder/xmlmarkup'
 
 class OfxGen
+  def generate_all
+    stocks = Stock.all
+    ofx = generate(stocks)
+
+    path = Rails.public_path + "kabuofx.ofx"
+    open(path, "w") do |f|
+      f.write(ofx)
+    end
+  end
+
   def generate(stocks)
     now = Time.now
 

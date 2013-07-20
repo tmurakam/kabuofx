@@ -6,7 +6,7 @@ class OfxGen
     stocks = Stock.all
     ofx = generate(stocks)
 
-    path = Rails.public_path + "kabuofx.ofx"
+    path = Rails.public_path + "ofx/kabuofx.ofx"
     open(path, "w") do |f|
       f.write(ofx)
     end

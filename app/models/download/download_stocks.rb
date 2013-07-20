@@ -40,7 +40,11 @@ class DownloadStocks
         price = cols[7].to_f
         
         # コードチェック
-        next if code !~ /\d\d\d\d-T/
+        if code =~ /(\d\d\d\d)-T/
+          code = $1
+        else
+          next
+        end
 
         # 既存エントリを探す
         stock = Stock.where(code: code).first

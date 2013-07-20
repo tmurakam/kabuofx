@@ -9,6 +9,8 @@ class DownloadStocks
       csv = data.read
       import_csv(csv)
     end
+
+    OfxGen.new.generate_all
   end
 
   def import_csv(csv)

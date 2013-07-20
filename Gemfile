@@ -40,7 +40,11 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 # gem 'unicorn'
 
 # Use Capistrano for deployment
-gem 'capistrano', group: :development
+group :development do
+  gem 'capistrano'
+  gem 'capistrano_database_yml'
+  gem 'capistrano_colors'
+end
 
 #----------------------------------------------------
 gem 'bootstrap-sass'

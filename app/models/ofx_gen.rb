@@ -3,7 +3,7 @@ require 'builder/xmlmarkup'
 
 class OfxGen
   def generate_all
-    stocks = Stock.limit(1).all
+    stocks = Stock.all
     ofx = generate(stocks)
 
     path = Rails.public_path + "kabuofx.ofx"
@@ -15,7 +15,7 @@ class OfxGen
   def generate(stocks)
     now = Time.now
 
-    x = Builder::XmlMarkup.new(:indent => 4)
+    x = Builder::XmlMarkup.new(:indent => 1)
     x.instruct! :xml, version: "1.0", encoding: "UTF-8", standalone: "yes"
     x.instruct! :OFX, OFXHEADER: 200, VERSION: 200, SECURITY: "NONE", OLDFILEUID: "NONE", NEWFILEUID: "NONE"
 
@@ -44,7 +44,7 @@ class OfxGen
             x.DTASOF(datestring(now))
             x.CURDEF("JPY")
             x.INVACCTFROM {
-              x.BROKKERID("KabuOFX")
+              x.BROKERID("KabuOFX")
               x.ACCTID("00000")
             }
             x.INVPOSLIST {

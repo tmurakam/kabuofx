@@ -60,3 +60,5 @@ group :test, :development do
   #gem 'binding_of_caller'
   #gem 'annotate'
 end
+
+gem 'whenever'

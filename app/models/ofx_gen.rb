@@ -48,8 +48,8 @@ class OfxGen
               x.ACCTID("Dummy")
             }
             x.INVPOSLIST {
-              x.POSSTOCK {
-                stocks.each do |stock|
+              stocks.each do |stock|
+                x.POSSTOCK {
                   x.INVPOS {
                     x.SECID {
                       x.UNIQUEID(stock.code)
@@ -62,16 +62,16 @@ class OfxGen
                     x.MKTVAL(0)
                     x.DTPRICEASOF(datestring(stock.lastdate))
                   }
-                end
-              }
+                }
+              end
             }
           }
         }
       }
       x.SECLISTMSGSRSV1 {
         x.SECLIST {
-          x.STOCKINFO {
-            stocks.each do |stock|
+          stocks.each do |stock|
+            x.STOCKINFO {
               x.SECINFO {
                 x.SECID {
                   x.UNIQUEID(stock.code)
@@ -84,8 +84,8 @@ class OfxGen
               }
               x.STOCKTYPE("COMMON")
               x.YIELD(0)
-            end
-          }
+            }
+          end
         }
       }
     }

@@ -21,6 +21,8 @@ namespace :db do
   desc "create symlink to database.yml"
   task :symlink do
     run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
+    run "/bin/rm -rf #{release_path}/public/ofx"
+    run "ln -nfs #{shared_path}/ofx #{release_path}/public/ofx"
   end
 end
 

@@ -11,6 +11,7 @@ class DownloadStocks
     end
 
     OfxGen.new.generate_all
+    return # no return value
   end
 
   def import_csv(csv)

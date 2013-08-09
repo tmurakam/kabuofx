@@ -24,11 +24,35 @@ $ ->
   # コードをロード
   load_codes = ->
     codes = JSON.parse(localStorage.getItem("codes")) || []
-
+    return
+    
   # コードを保存
   save_codes = ->
     localStorage.setItem("codes", JSON.stringify(codes))
+    return
     
+  # 全銘柄名取得
+  resolve_all_stock_names = ->
+    for code in codes
+      if !stock_names[code]
+        get_stock_name(code)
+        break
+    return
+    
+  # 銘柄取得
+  get_stock_name = (code) ->
+    $.ajax
+      type: "GET"
+      url: "/stocks/name/#{code}"
+      dataType: "json"
+      success: (data, status, xhr) ->
+        name = "(不明)"
+        name = data.name if data.name
+        stock_names[code] = name
+        $("#stock_name_#{code}").text(name)
+        resolve_all_stock_names()
+    return
+              
   # View
   render = ->
     tbody = $("#rows")
@@ -36,11 +60,20 @@ $ ->
     for code in codes
       tr = $("<tr></tr>")
       tbody.append(tr)
-      tr.append($("<td></td>").text(code))
-      tr.append($("<td></td>"))
+      
+      $("<td></td>").text(code).appendTo(tr)
+
+      td = $("<td id='stock_name_#{code}'></td>").appendTo(tr)
+      if stock_names[code]
+        td.text(stock_names[code])
+      
       del = $("<button class='btn btn-danger'>削除</button>")
-      del.on "click", ->
-        on_remove_code(code)
+      # code の値をイベントハンドラ内で使用するクロージャにする
+      do (code) ->
+        del.on "click", ->
+            on_remove_code(code)
+          return
+        return
       tr.append($("<td></td>").append(del))
     return
     
@@ -52,20 +85,24 @@ $ ->
       if add_code(code)
         save_codes()
         render()
+        resolve_all_stock_names()
     else
       alert("コードは4桁の整数で入力してください")
-
+    return
+    
   # コード削除
   on_remove_code = (code) ->
     if remove_code(code)
       save_codes()
       render()
-
+    return
+    
   # OFX ダウンロード
   download_ofx = ->
     url = "/downloads/ofx?codes=" + codes.join(",")
     location.href = url
-
+    return
+    
   # イベントハンドラ設定
   $("#add_code").on "click", on_add_code
 
@@ -81,4 +118,5 @@ $ ->
 
   # 初期化
   load_codes()
+  resolve_all_stock_names()
   render()

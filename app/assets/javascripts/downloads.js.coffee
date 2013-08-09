@@ -1,7 +1,8 @@
 $ ->
   # model
   codes = []
-
+  stock_names = {}
+  
   # コード追加
   add_code = (code) ->
     # 重複チェック
@@ -19,9 +20,11 @@ $ ->
         return true
     return false
 
+  # コードをロード
   load_codes = ->
     codes = JSON.parse(localStorage.getItem("codes")) || []
-    
+
+  # コードを保存
   save_codes = ->
     localStorage.setItem("codes", JSON.stringify(codes))
     
@@ -60,6 +63,7 @@ $ ->
   # コード追加イベントハンドラ
   $("#add_code").on "click", on_add_code
 
+  # Enter キー処理
   $("#add_code_form").keypress (ev) ->
     if (ev.witch == 13 || ev.keyCode == 13)
       on_add_code()
@@ -67,8 +71,6 @@ $ ->
     else
       return true
 
-  # initialize
+  # 初期化
   load_codes()
   render()
-    
-    

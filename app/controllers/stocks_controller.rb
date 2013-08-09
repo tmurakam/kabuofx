@@ -9,14 +9,16 @@ class StocksController < ApplicationController
   # 証券名取得
   def names
     codes = params[:codes].split(/,/)
-    json = []
+    json = {}
 
     codes.each do |code|
       @stock = Stock.where(:code => code).first
       if @stock
-        json.push({:code => @stock.code, :name => @stock.name})
-      else
-        json.push({:code => code, :name => "-"})
+        json[@stock.code] = {
+          :name => @stock.name,
+          :price => @stock.price,
+          :date => @stock.lastdate
+        }
       end
     end
     render :json => json

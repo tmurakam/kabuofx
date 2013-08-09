@@ -1,8 +1,11 @@
 $ ->
+  # コード編集画面チェック
+  return if $("#code_rows").length == 0
+
   # model
   codes = []
-  stock_names = {}
-  
+  stocks = {}    
+    
   # コード追加
   add_code = (code) ->
     # 重複チェック
@@ -31,31 +34,40 @@ $ ->
     localStorage.setItem("codes", JSON.stringify(codes))
     return
     
-  # 銘柄取得
-  get_stock_names = ->
+  # 銘柄情報
+  get_stocks = ->
     $.ajax
       type: "GET"
       url: "/stocks/names/#{codes.join(',')}"
       dataType: "json"
       success: (data, status, xhr) ->
-        for stock in data
-          stock_names[stock.code] = stock.name
-          $("#stock_name_#{stock.code}").text(stock.name)
+        stocks = data
+        render()
     return
               
   # View
   render = ->
-    tbody = $("#rows")
+    tbody = $("#code_rows")
     tbody.empty()
     for code in codes
+      stock = stocks[code]
+      
       tr = $("<tr></tr>")
       tbody.append(tr)
       
       $("<td></td>").text(code).appendTo(tr)
 
       td = $("<td id='stock_name_#{code}'></td>").appendTo(tr)
-      if stock_names[code]
-        td.text(stock_names[code])
+      if stock
+        td.text(stock.name)
+
+      td = $("<td></td>").appendTo(tr)
+      if stock
+        td.text(stock.price)
+
+      td = $("<td></td>").appendTo(tr)
+      if stock
+        td.text(stock.date)
       
       del = $("<button class='btn btn-danger'>削除</button>")
       # code の値をイベントハンドラ内で使用するクロージャにする
@@ -109,4 +121,4 @@ $ ->
   # 初期化
   load_codes()
   render()
-  get_stock_names()
+  get_stocks()

@@ -57,7 +57,7 @@ $ ->
       
       $("<td></td>").text(code).appendTo(tr)
 
-      td = $("<td id='stock_name_#{code}'></td>").appendTo(tr)
+      td = $("<td></td>").appendTo(tr)
       if stock
         td.text(stock.name)
 
@@ -70,13 +70,13 @@ $ ->
         td.text(stock.date)
       
       del = $("<button class='btn btn-danger'>削除</button>")
-      # code の値をイベントハンドラ内で使用するクロージャにする
+      # code の値をイベントハンドラ内で使用するため、クロージャにする
       do (code) ->
         del.on "click", ->
             on_remove_code(code)
           return
         return
-      tr.append($("<td></td>").append(del))
+      $("<td></td>").append(del).appendTo(tr)
     return
     
   # コード追加
@@ -87,7 +87,7 @@ $ ->
       if add_code(code)
         save_codes()
         render()
-        resolve_all_stock_names()
+        get_stocks()
     else
       alert("コードは4桁の整数で入力してください")
     return

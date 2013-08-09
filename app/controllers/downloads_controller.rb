@@ -4,6 +4,10 @@ class DownloadsController < ApplicationController
   def index
   end
 
+  # コード編集画面
+  def codes
+  end
+
   # OFX ダウンロード
   def ofx
     codes = params[:codes]

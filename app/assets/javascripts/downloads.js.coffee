@@ -10,6 +10,7 @@ $ ->
       if c == code
         return false
     codes.push(code)
+    codes.sort()
     return true
 
   # コード削除

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 require 'builder/xmlmarkup'
 
+# OFX 生成
 class OfxGen
+  # 全株式に対して OFX を生成し、public/ofx/kabuofx.ofx に出力する
   def generate_all
     stocks = Stock.all
     ofx = generate(stocks)
@@ -12,6 +14,9 @@ class OfxGen
     end
   end
 
+  # OFX データを生成する
+  # stocks: 生成対象の Stock データ
+  # @return OFXテキスト
   def generate(stocks)
     now = Time.now
 

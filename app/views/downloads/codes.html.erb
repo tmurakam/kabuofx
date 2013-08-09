@@ -1,0 +1,50 @@
+<div class="page-header">
+  <h1>証券コード編集</h1>
+</div>
+
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th>コード</th>
+      <th>銘柄</th>
+      <th>終値</th>
+      <th>更新日</thp>
+      <th width='10%'></th>
+    </tr>
+  </thead>
+
+  <tbody id="code_rows">
+  </tbody>
+</table>
+
+<form class="form-inline" id="add_code_form">
+  <input type="text" class="form-control" placeholder="コード" id="code_field" />
+  <button type="button" id="add_code" class="btn">追加</button>
+</form>
+
+<br/>
+
+<button type="button" id="download_ofx" class="btn btn-primary">
+  <i class="icon-hdd icon-white"></i> OFXファイルダウンロード
+</button>
+
+<hr>
+<h2>使い方</h2>
+
+<p>ダウンロードしたい株価の証券コードセットを作成できます。</p>
+
+<ul>
+  <li>証券コード(4桁)を入力して「追加」を押すと証券コードを追加します</li>
+  <li>削除を押すと削除できます</li>
+  <li>OFXファイルダウンロードボタンを押すと、指定された証券コードの株価一式をダウンロードします</li>
+</ul>
+
+<p>
+ここで編集したコードセットは、ブラウザの local storage に保存されます。
+なお、Internet Explorer 7 以下では動作しません。IE8 以上、Chrome, Firefox などをお使いください。
+</P>
+
+
+
+
+

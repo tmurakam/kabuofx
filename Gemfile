@@ -54,6 +54,7 @@ gem 'kaminari'
 gem 'builder'
 
 group :test, :development do
+  gem 'spork', '>= 1.0.0rc3' # for rails4
   gem 'rspec-rails'
   gem 'factory_girl_rails'
   #gem 'capybara'

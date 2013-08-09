@@ -7,11 +7,17 @@ class StocksController < ApplicationController
   end
 
   # 証券名取得
-  def name
-    @stock = Stock.where(:code => params[:code]).first
-    json = {}
-    if @stock
-      json = {:code => @stock.code, :name => @stock.name}
+  def names
+    codes = params[:codes].split(/,/)
+    json = []
+
+    codes.each do |code|
+      @stock = Stock.where(:code => code).first
+      if @stock
+        json.push({:code => @stock.code, :name => @stock.name})
+      else
+        json.push({:code => code, :name => "-"})
+      end
     end
     render :json => json
   end

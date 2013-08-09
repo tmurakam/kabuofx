@@ -4,7 +4,7 @@ Kabuofx::Application.routes.draw do
   get "downloads/codes" => "downloads#codes"
 
   resources :stocks, :only => [:index]
-  get "stocks/name/:code" => "stocks#name"
+  get "stocks/names/:codes" => "stocks#names"
 
   root 'downloads#index'
 end

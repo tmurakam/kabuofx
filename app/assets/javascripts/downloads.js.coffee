@@ -31,26 +31,16 @@ $ ->
     localStorage.setItem("codes", JSON.stringify(codes))
     return
     
-  # 全銘柄名取得
-  resolve_all_stock_names = ->
-    for code in codes
-      if !stock_names[code]
-        get_stock_name(code)
-        break
-    return
-    
   # 銘柄取得
-  get_stock_name = (code) ->
+  get_stock_names = ->
     $.ajax
       type: "GET"
-      url: "/stocks/name/#{code}"
+      url: "/stocks/names/#{codes.join(',')}"
       dataType: "json"
       success: (data, status, xhr) ->
-        name = "(不明)"
-        name = data.name if data.name
-        stock_names[code] = name
-        $("#stock_name_#{code}").text(name)
-        resolve_all_stock_names()
+        for stock in data
+          stock_names[stock.code] = stock.name
+          $("#stock_name_#{stock.code}").text(stock.name)
     return
               
   # View
@@ -118,5 +108,5 @@ $ ->
 
   # 初期化
   load_codes()
-  resolve_all_stock_names()
   render()
+  get_stock_names()

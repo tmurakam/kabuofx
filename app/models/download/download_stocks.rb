@@ -2,7 +2,9 @@
 require 'csv'
 require 'open-uri'
 
+# 株価取得
 class DownloadStocks
+  # 株価情報をダウンロードする
   def download
     url = "http://k-db.com/site/download.aspx?p=all&download=csv"
     open(url, 'r:Shift_JIS') do |data|
@@ -14,6 +16,9 @@ class DownloadStocks
     return # no return value
   end
 
+  private
+
+  # 株価 CSV ファイルをパースし、データを保存
   def import_csv(csv)
     ActiveRecord::Base::transaction() do
       lineno = 0
@@ -48,6 +53,9 @@ class DownloadStocks
         else
           next
         end
+
+        # 価格チェック
+        next if price == 0
 
         # 既存エントリを探す
         stock = Stock.where(code: code).first

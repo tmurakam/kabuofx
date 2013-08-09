@@ -16,6 +16,9 @@
 /tmp
 *~
 
+# No gemfile.lock for windows env.
+/Gemfile.lock
+
 # private
 /config/database.yml
 /secret

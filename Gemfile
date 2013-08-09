@@ -5,7 +5,7 @@ gem 'rails', '4.0.0'
 
 # database for Active Record
 gem 'sqlite3'
-gem 'mysql2'
+gem 'mysql2', platforms: :ruby
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.0'
@@ -54,6 +54,7 @@ gem 'kaminari'
 gem 'builder'
 
 group :test, :development do
+  gem 'spork', '>= 1.0.0rc3' # for rails4
   gem 'rspec-rails'
   gem 'factory_girl_rails'
   #gem 'capybara'
@@ -61,7 +62,7 @@ group :test, :development do
   gem 'guard-spork'
   #gem 'rb-inotify'
   #gem 'simplecov'
-  gem 'debugger'
+  gem 'debugger', platforms: :ruby # conflicts with intellij debugger
   gem 'better_errors'
   #gem 'binding_of_caller'
   #gem 'annotate'

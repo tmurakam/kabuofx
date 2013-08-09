@@ -2,6 +2,23 @@ $ ->
   # model
   codes = []
 
+  # コード追加
+  add_code = (code) ->
+    # 重複チェック
+    for c in codes
+      if c == code
+        return false
+    codes.push(code)
+    return true
+
+  # コード削除
+  remove_code = (code) ->
+    for i in [0..codes.length-1]
+      if codes[i] == code
+        codes.splice(i, 1)
+        return true
+    return false
+
   load_codes = ->
     codes = JSON.parse(localStorage.getItem("codes")) || []
     
@@ -19,34 +36,36 @@ $ ->
       tr.append($("<td></td>"))
       del = $("<button class='btn btn-danger'>削除</button>")
       del.on "click", ->
-        remove_code(code)
-      tr.append(del)
+        on_remove_code(code)
+      tr.append($("<td></td>").append(del))
     return
     
   # コード追加
-  add_code = ->
+  on_add_code = ->
     code = $("#code_field").val()
     $("#code_field").val("")
     if /^\d\d\d\d$/.test(code)
-      codes.push(code)
-      save_codes()
-      render()
+      if add_code(code)
+        save_codes()
+        render()
     else
       alert("コードは4桁の整数で入力してください")
 
   # コード削除
-  remove_code = (code) ->
-    for i in [0..codes.length-1]
-      if codes[i] == code
-        codes.splice(i, 1)
-        break
-    save_codes()
-    render()
+  on_remove_code = (code) ->
+    if remove_code(code)
+      save_codes()
+      render()
     
   # コード追加イベントハンドラ
-  $("#add_code").on "click", add_code
-  $("#add_code").keypress (ev) ->
-    alert(ev)
+  $("#add_code").on "click", on_add_code
+
+  $("#add_code_form").keypress (ev) ->
+    if (ev.witch == 13 || ev.keyCode == 13)
+      on_add_code()
+      return false
+    else
+      return true
 
   # initialize
   load_codes()

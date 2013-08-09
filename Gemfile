@@ -62,7 +62,7 @@ group :test, :development do
   gem 'guard-spork'
   #gem 'rb-inotify'
   #gem 'simplecov'
-  gem 'debugger'
+  gem 'debugger', platforms: :ruby # conflicts with intellij debugger
   gem 'better_errors'
   #gem 'binding_of_caller'
   #gem 'annotate'

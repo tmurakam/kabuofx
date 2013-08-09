@@ -1,5 +1,6 @@
 2013-08-09 : Takuya Murakami
 
+	* 証券コード編集機能追加
 	* OFX ダウンロード時に株価コードを codes= で設定できるようにした
 
 2013-07-24 : Takuya Murakami

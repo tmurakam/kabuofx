@@ -50,24 +50,14 @@ $ ->
     tbody = $("#code_rows")
     tbody.empty()
     for code in codes
-      stock = stocks[code]
+      stock = stocks[code] || {name: "-"}
       
-      tr = $("<tr></tr>")
-      tbody.append(tr)
+      tr = $("<tr></tr>").appendTo(tbody)
       
       $("<td></td>").text(code).appendTo(tr)
-
-      td = $("<td></td>").appendTo(tr)
-      if stock
-        td.text(stock.name)
-
-      td = $("<td></td>").appendTo(tr)
-      if stock
-        td.text(stock.price)
-
-      td = $("<td></td>").appendTo(tr)
-      if stock
-        td.text(stock.date)
+      $("<td></td>").text(stock.name).appendTo(tr)
+      $("<td></td>").text(stock.price).appendTo(tr)
+      $("<td></td>").text(stock.date).appendTo(tr)
       
       del = $("<button class='btn btn-danger'>削除</button>")
       # code の値をイベントハンドラ内で使用するため、クロージャにする

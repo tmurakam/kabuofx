@@ -59,10 +59,17 @@ $ ->
     if remove_code(code)
       save_codes()
       render()
-    
-  # コード追加イベントハンドラ
+
+  # OFX ダウンロード
+  download_ofx = ->
+    url = "/downloads/ofx?codes=" + codes.join(",")
+    location.href = url
+
+  # イベントハンドラ設定
   $("#add_code").on "click", on_add_code
 
+  $("#download_ofx").on "click", download_ofx
+  
   # Enter キー処理
   $("#add_code_form").keypress (ev) ->
     if (ev.witch == 13 || ev.keyCode == 13)

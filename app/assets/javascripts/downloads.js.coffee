@@ -2,16 +2,16 @@ $ ->
   # model
   codes = []
 
-  load_codes ->
+  load_codes = ->
     codes = JSON.parse(localStorage.getItem("codes")) || []
     
-  save_codes ->
+  save_codes = ->
     localStorage.setItem("codes", JSON.stringify(codes))
     
   # View
   render = ->
     tbody = $("#rows")
-    tbody.empty
+    tbody.empty()
     for code in codes
       tr = $("<tr></tr>")
       tbody.append(tr)
@@ -29,8 +29,8 @@ $ ->
     $("#code_field").val("")
     if /^\d\d\d\d$/.test(code)
       codes.push(code)
-      save_codes
-      render
+      save_codes()
+      render()
     else
       alert("コードは4桁の整数で入力してください")
 
@@ -40,8 +40,8 @@ $ ->
       if codes[i] == code
         codes.splice(i, 1)
         break
-    save_codes
-    render
+    save_codes()
+    render()
     
   # コード追加イベントハンドラ
   $("#add_code").on "click", add_code
@@ -49,7 +49,7 @@ $ ->
     alert(ev)
 
   # initialize
-  load_codes
-  render
+  load_codes()
+  render()
     
     

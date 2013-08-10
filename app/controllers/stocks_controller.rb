@@ -6,8 +6,9 @@ class StocksController < ApplicationController
     @stocks = Stock.all
   end
 
-  # 証券名取得
-  def names
+  # GET /api/stocks/:codes
+  # API : 情報取得
+  def api_index
     codes = params[:codes].split(/,/)
     json = {}
 

@@ -38,7 +38,7 @@ $ ->
   get_stocks = ->
     $.ajax
       type: "GET"
-      url: "/stocks/names/#{codes.join(',')}"
+      url: "/api/stocks/#{codes.join(',')}"
       dataType: "json"
       success: (data, status, xhr) ->
         stocks = data
@@ -63,7 +63,7 @@ $ ->
       # code の値をイベントハンドラ内で使用するため、クロージャにする
       do (code) ->
         del.on "click", ->
-            on_remove_code(code)
+          on_remove_code(code)
           return
         return
       $("<td></td>").append(del).appendTo(tr)

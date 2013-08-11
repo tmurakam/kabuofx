@@ -150,19 +150,23 @@ $ ->
         @collection.add(stock)
         @collection.save()
         @collection.get_stocks()
-
-  # OFX ダウンロード
-  download_ofx = ->
-    url = "/downloads/ofx?codes=" + stocks.get_codes().join(",")
-    location.href = url
-    return
+        
+  DownloadView = Backbone.View.extend
+    el: "#download_ofx"
     
-  $("#download_ofx").on "click", download_ofx
+    events:
+      'click button': 'download_ofx'
+
+    download_ofx: ->
+      url = "/downloads/ofx?codes=" + @collection.get_codes().join(",")
+      location.href = url
+      return
 
   stocks = new Stocks()
   stocksView = new StocksView({collection: stocks})
   addStockView = new AddStockView({collection: stocks})  
-
+  downloadView = new DownloadView({collection: stocks})
+  
   stocks.load()
   stocks.get_stocks()
   

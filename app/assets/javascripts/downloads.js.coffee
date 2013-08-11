@@ -17,40 +17,40 @@ $ ->
       return
 
     initialize: ->
-      @listenTo(this, 'invalid', (model, error) ->
-        alert(error)
-      )
+      @listenTo this, 'invalid', (model, error) ->
+        alert error
 
   # Collection
   Stocks = Backbone.Collection.extend
     model: Stock
 
     initialize: ->
-      @listenTo(this, "remove", @save)
+      @listenTo this, "remove", @save
 
     # code でソート
     comparator: 'code'
 
     load: ->
-      codes = JSON.parse(localStorage.getItem("codes")) || []
-      _.each(codes, (code, index, list) ->
+      codes = JSON.parse(localStorage.getItem "codes") || []
+      _.each codes, (code) ->
         if code
-          stock = new Stock({code: code, collection: this})
+          stock = new Stock
+            code: code
+            collection: this
           this.add(stock)
-      this)
+      , this
       
     save: ->
       codes = @get_codes()
-      localStorage.setItem("codes", JSON.stringify(codes))
+      localStorage.setItem "codes", JSON.stringify codes
 
     get_codes: ->    
       codes = []
-      _.each(@models, (model, index, list) ->
-        code = model.get('code')
-        if code
-          codes.push(model.get('code'))
-      )
-      return codes
+      _(@models).each (model) ->
+        code = model.get 'code'
+        codes.push code if code
+        return
+      codes
       
     get_stocks: ->
       codes = @get_codes()
@@ -60,14 +60,14 @@ $ ->
         url: "/api/stocks/#{codes.join(',')}"
         dataType: "json"
         success: (data, status, xhr) ->
-          _.each(@models, (model) ->
-            d = data[model.get('code')]
+          _.each @models, (model) ->
+            d = data[model.get 'code']
             if d
-              model.set('name', d.name)
-              model.set('price', d.price)
-              model.set('date', d.date)
-              model.trigger('change')
-          this)
+              model.set
+                name: d.name
+                price: d.price
+                date: d.date
+          , this
       return
               
   # View
@@ -75,8 +75,8 @@ $ ->
     tagName: 'tr'
 
     initialize: ->
-      @listenTo(@model, 'change', @render)
-      @listenTo(@model, 'destroy', @remove)
+      @listenTo @model, 'change', @render
+      @listenTo @model, 'destroy', @remove
 
     template: _.template("<td><%= code %></td><td><%= name %></td><td><%= price %></td><td><%= date %></td><td><button class='delete btn btn-danger'>削除</button></td>")
 
@@ -85,15 +85,15 @@ $ ->
 
     destroy: ->
       #if (confirm('are you sure?'))
-      @collection.remove(@model)
+      @collection.remove @model
       @model.destroy()
 
     remove: ->
       @$el.remove()
       
     render: ->
-      html = @template(@model.toJSON())
-      @$el.html(html)      
+      html = @template @model.toJSON()
+      @$el.html html
       return this
       
   StocksView = Backbone.View.extend
@@ -101,12 +101,12 @@ $ ->
 
     initialize: ->
       @views = []
-      @listenTo(@collection, 'change', @render)
+      @listenTo @collection, 'change', @render
 
     add_stock: (stock) ->
       stockView = new StockView({model: stock, collection: @collection})
-      @$el.append(stockView.render().el)
-      @views.push(stockView)
+      @$el.append stockView.render().el
+      @views.push stockView
       return
 
     dispose: ->
@@ -118,10 +118,10 @@ $ ->
     render: ->
       @$el.empty()
       @dispose()
-      @collection.each((stock) ->
-        @add_stock(stock)
+      @collection.each (stock) ->
+        @add_stock stock
         return
-      , this)
+      , this
       return this
 
   AddStockView = Backbone.View.extend
@@ -145,7 +145,7 @@ $ ->
       code = $("#code_field").val()
       $("#code_field").val("")
       
-      stock = new Stock({}, {collection: stocks})
+      stock = new Stock {}, {collection: stocks}
       if stock.set('code', code, {validate: true})
         @collection.add(stock)
         @collection.save()

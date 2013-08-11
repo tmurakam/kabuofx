@@ -25,12 +25,16 @@ $ ->
     model: Stock
 
     initialize: ->
+      @loading = false
+      @listenTo this, "add", @save
       @listenTo this, "remove", @save
 
     # code でソート
     comparator: 'code'
 
+    # local storage から設定ロード
     load: ->
+      @loading = true
       codes = JSON.parse(localStorage.getItem "codes") || []
       _.each codes, (code) ->
         if code
@@ -39,11 +43,17 @@ $ ->
             collection: this
           this.add(stock)
       , this
-      
-    save: ->
-      codes = @get_codes()
-      localStorage.setItem "codes", JSON.stringify codes
+      @loading = false
+      @download_stocks()
+      return
 
+    # local storage に設定保存
+    save: ->
+      if !@loading
+        codes = @get_codes()
+        localStorage.setItem "codes", JSON.stringify codes
+
+    # 証券コード配列を得る
     get_codes: ->    
       codes = []
       _(@models).each (model) ->
@@ -51,8 +61,9 @@ $ ->
         codes.push code if code
         return
       codes
-      
-    get_stocks: ->
+
+    # サーバから証券情報を取得する
+    download_stocks: ->
       codes = @get_codes()
       $.ajax
         context: this
@@ -104,11 +115,14 @@ $ ->
       @listenTo @collection, 'change', @render
 
     add_stock: (stock) ->
-      stockView = new StockView({model: stock, collection: @collection})
+      stockView = new StockView
+        model: stock
+        collection: @collection
       @$el.append stockView.render().el
       @views.push stockView
       return
 
+    # メモリリーク対策。view全解放
     dispose: ->
       _.each @views, (view) ->
         view.remove()
@@ -132,7 +146,7 @@ $ ->
       'keypress #code_field': 'keypress'
       
     keypress: (e) ->
-      if (e.witch == 13 || e.keyCode == 13)
+      if e.witch == 13 || e.keyCode == 13
         e.preventDefault()
         @add_code(e)
         return false
@@ -146,10 +160,9 @@ $ ->
       $("#code_field").val("")
       
       stock = new Stock {}, {collection: stocks}
-      if stock.set('code', code, {validate: true})
+      if stock.set 'code', code, {validate: true}
         @collection.add(stock)
-        @collection.save()
-        @collection.get_stocks()
+        @collection.download_stocks()
         
   DownloadView = Backbone.View.extend
     el: "#download_ofx"
@@ -168,5 +181,4 @@ $ ->
   downloadView = new DownloadView({collection: stocks})
   
   stocks.load()
-  stocks.get_stocks()
   

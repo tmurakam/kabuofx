@@ -12,8 +12,8 @@ $ ->
     validate: (attrs) ->
       if !(/^\d\d\d\d$/.test(attrs.code))
         return "コードは4桁の整数で入力してください"
-      #if @collection.findWhere({code: attrs.code})
-      #  return "コードが重複しています"
+      if @collection.findWhere({code: attrs.code})
+        return "コードが重複しています"
       return
 
     initialize: ->
@@ -113,11 +113,12 @@ $ ->
 
     events:
       'click #add_code': 'add_code'
-      'keypress #add_code_form': 'keypress'
+      'keypress #code_field': 'keypress'
       
     keypress: (e) ->
       if (e.witch == 13 || e.keyCode == 13)
-        add_code(e)
+        e.preventDefault()
+        @add_code(e)
         return false
       else
         return true

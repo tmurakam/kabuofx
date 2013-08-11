@@ -4,19 +4,36 @@ $ ->
 
   # Model
   Stock = Backbone.Model.extend
+    defaults:
+      code: '0000'
+      name: '-'
+      price: '-'
+      date: '-'
+      
     validate: (attrs) ->
-      if @collection.collection.findWhere({code: attrs.code})
-        return "コード重複"
+      if !(/^\d\d\d\d$/.test(attrs.code))
+        return "コードは4桁の整数で入力してください"
+      if @collection.findWhere({code: attrs.code})
+        return "コードが重複しています"
       return
+
+    initialize: ->
+      @listenTo(this, 'invalid', (model, error) ->
+        alert(error)
+      )
 
   # Collection
   Stocks = Backbone.Collection.extend
     model: Stock
-      
+
+    # code でソート
+    comparator: 'code'
+                  
     load: ->
       codes = JSON.parse(localStorage.getItem("codes")) || []
-      _.each(codes, (element, index, list) ->
-        this.add(new Stock(element))
+      _.each(codes, (code, index, list) ->
+        stock = new Stock({code: code, collection: this})
+        this.add(stock)
       this)
       
     save: ->
@@ -38,14 +55,13 @@ $ ->
         url: "/api/stocks/#{codes.join(',')}"
         dataType: "json"
         success: (data, status, xhr) ->
-          _.each(@models, (model, index, list) ->
-            d = data[model.code]
+          _.each(@models, (model) ->
+            d = data[model.get('code')]
             if d
-              model.price = d.price
-              model.name = d.name
-              model.date = d.date
+              model.set('name', d.name)
+              model.set('price', d.price)
+              model.set('date', d.date)
           this)
-          # render?
       return
               
   # View
@@ -72,8 +88,12 @@ $ ->
       
   StocksView = Backbone.View.extend
     el: "#code_rows"
-    
+
+    initialize: ->
+      @collection.on('change', @render)
+      
     render: ->
+      @$el.empty()
       @collection.each((stock) ->
         stockView = new StockView({model: stock})
         @$el.append(stockView.render().el)
@@ -100,14 +120,11 @@ $ ->
       code = $("#code_field").val()
       $("#code_field").val("")
       
-      if /^\d\d\d\d$/.test(code)
-        if add_code(code)
-          stock = new Stock({code: code})
-          @collection.add(stock)
-          @collection.save()
-          @collection.get_stocks()
-      else
-        alert("コードは4桁の整数で入力してください")
+      stock = new Stock({code: code, collection: stocks})
+      if stock.set('code', code, {validate: true})
+        @collection.add(stock)
+        @collection.save()
+        @collection.get_stocks()
 
   # OFX ダウンロード
   download_ofx = ->
@@ -122,10 +139,5 @@ $ ->
   addStockView = new AddStockView({collection: tasks})  
 
   stocks.load()
+  $("#code_rows").html(stocksView.render().el)
   stocks.get_stocks()
-  
-
-  # 初期化
-  load_codes()
-  render()
-  get_stocks()

@@ -25,9 +25,12 @@ $ ->
   Stocks = Backbone.Collection.extend
     model: Stock
 
+    initialize: ->
+      @listenTo(this, "remove", @save)
+
     # code でソート
     comparator: 'code'
-                  
+                                                      
     load: ->
       codes = JSON.parse(localStorage.getItem("codes")) || []
       _.each(codes, (code, index, list) ->
@@ -35,7 +38,6 @@ $ ->
           stock = new Stock({code: code, collection: this})
           this.add(stock)
       this)
-      @trigger('reload')
       
     save: ->
       codes = @get_codes()
@@ -64,8 +66,8 @@ $ ->
               model.set('name', d.name)
               model.set('price', d.price)
               model.set('date', d.date)
+              model.trigger('change')
           this)
-          @trigger('reload')
       return
               
   # View
@@ -73,18 +75,22 @@ $ ->
     tagName: 'tr'
 
     initialize: ->
-      @listenTo(@model, 'change', @change)
-      @listenTo(@model, 'remove', @remove)
+      @listenTo(@model, 'change', @render)
+      @listenTo(@model, 'destroy', @remove)
 
-    template: _.template("<td><%= code %></td><td><%= name %></td><td><%= price %></td><td><%= date %></td><button class='delete btn btn-danger'>削除</button>")
+    template: _.template("<td><%= code %></td><td><%= name %></td><td><%= price %></td><td><%= date %></td><td><button class='delete btn btn-danger'>削除</button></td>")
 
     events:
       'click .delete': 'destroy'
 
     destroy: ->
-      if (confirm('are you sure?'))
-        @model.destroy
-        
+      #if (confirm('are you sure?'))
+      @collection.remove(@model)
+      @model.destroy()
+
+    remove: ->
+      @$el.remove()
+      
     render: ->
       html = @template(@model.toJSON())
       @$el.html(html)      
@@ -94,15 +100,12 @@ $ ->
     el: "#code_rows"
 
     initialize: ->
-      @listenTo(@collection, 'reload', @render)
-
-    on_reload: ->
-      @render()
+      @listenTo(@collection, 'change', @render)
             
     render: ->
       @$el.empty()
       @collection.each((stock) ->
-        stockView = new StockView({model: stock})
+        stockView = new StockView({model: stock, collection: @collection})
         @$el.append(stockView.render().el)
         return
       this)

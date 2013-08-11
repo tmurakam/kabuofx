@@ -53,6 +53,9 @@ gem 'kaminari'
 
 gem 'builder'
 
+#gem 'rails-backbone'
+gem 'backbone-on-rails'
+
 group :test, :development do
   gem 'spork', '>= 1.0.0rc3' # for rails4
   gem 'rspec-rails'

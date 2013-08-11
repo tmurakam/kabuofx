@@ -5,7 +5,6 @@ $ ->
   # Model
   Stock = Backbone.Model.extend
     defaults:
-      code: '0000'
       name: '-'
       price: '-'
       date: '-'
@@ -13,8 +12,8 @@ $ ->
     validate: (attrs) ->
       if !(/^\d\d\d\d$/.test(attrs.code))
         return "コードは4桁の整数で入力してください"
-      if @collection.findWhere({code: attrs.code})
-        return "コードが重複しています"
+      #if @collection.findWhere({code: attrs.code})
+      #  return "コードが重複しています"
       return
 
     initialize: ->
@@ -32,9 +31,11 @@ $ ->
     load: ->
       codes = JSON.parse(localStorage.getItem("codes")) || []
       _.each(codes, (code, index, list) ->
-        stock = new Stock({code: code, collection: this})
-        this.add(stock)
+        if code
+          stock = new Stock({code: code, collection: this})
+          this.add(stock)
       this)
+      @trigger('reload')
       
     save: ->
       codes = @get_codes()
@@ -42,8 +43,10 @@ $ ->
 
     get_codes: ->    
       codes = []
-      _.each(@models, (element, index, list) ->
-        codes.push(element.code)
+      _.each(@models, (model, index, list) ->
+        code = model.get('code')
+        if code
+          codes.push(model.get('code'))
       )
       return codes
       
@@ -62,6 +65,7 @@ $ ->
               model.set('price', d.price)
               model.set('date', d.date)
           this)
+          @trigger('reload')
       return
               
   # View
@@ -84,19 +88,23 @@ $ ->
     render: ->
       html = @template(@model.toJSON())
       @$el.html(html)      
-      this
+      return this
       
   StocksView = Backbone.View.extend
     el: "#code_rows"
 
     initialize: ->
-      @collection.on('change', @render)
-      
+      @listenTo(@collection, 'reload', @render)
+
+    on_reload: ->
+      @render()
+            
     render: ->
       @$el.empty()
       @collection.each((stock) ->
         stockView = new StockView({model: stock})
         @$el.append(stockView.render().el)
+        return
       this)
       return this
 
@@ -120,7 +128,7 @@ $ ->
       code = $("#code_field").val()
       $("#code_field").val("")
       
-      stock = new Stock({code: code, collection: stocks})
+      stock = new Stock({}, {collection: stocks})
       if stock.set('code', code, {validate: true})
         @collection.add(stock)
         @collection.save()
@@ -135,9 +143,9 @@ $ ->
   $("#download_ofx").on "click", download_ofx
 
   stocks = new Stocks()
-  stocksView = new StocksView({collection: tasks})
-  addStockView = new AddStockView({collection: tasks})  
+  stocksView = new StocksView({collection: stocks})
+  addStockView = new AddStockView({collection: stocks})  
 
   stocks.load()
-  $("#code_rows").html(stocksView.render().el)
   stocks.get_stocks()
+  

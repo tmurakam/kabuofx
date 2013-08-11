@@ -30,7 +30,7 @@ $ ->
 
     # code でソート
     comparator: 'code'
-                                                      
+
     load: ->
       codes = JSON.parse(localStorage.getItem("codes")) || []
       _.each(codes, (code, index, list) ->
@@ -100,15 +100,28 @@ $ ->
     el: "#code_rows"
 
     initialize: ->
+      @views = []
       @listenTo(@collection, 'change', @render)
-            
+
+    add_stock: (stock) ->
+      stockView = new StockView({model: stock, collection: @collection})
+      @$el.append(stockView.render().el)
+      @views.push(stockView)
+      return
+
+    dispose: ->
+      _.each @views, (view) ->
+        view.remove()
+      @views = []
+      return
+      
     render: ->
       @$el.empty()
+      @dispose()
       @collection.each((stock) ->
-        stockView = new StockView({model: stock, collection: @collection})
-        @$el.append(stockView.render().el)
+        @add_stock(stock)
         return
-      this)
+      , this)
       return this
 
   AddStockView = Backbone.View.extend

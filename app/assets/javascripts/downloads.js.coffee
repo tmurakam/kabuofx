@@ -2,111 +2,128 @@ $ ->
   # コード編集画面チェック
   return if $("#code_rows").length == 0
 
-  # model
-  codes = []
-  stocks = {}    
-    
-  # コード追加
-  add_code = (code) ->
-    # 重複チェック
-    for c in codes
-      if c == code
-        return false
-    codes.push(code)
-    codes.sort()
-    return true
+  # Model
+  Stock = Backbone.Model.extend
+    validate: (attrs) ->
+      if @collection.collection.findWhere({code: attrs.code})
+        return "コード重複"
+      return
 
-  # コード削除
-  remove_code = (code) ->
-    for i in [0..codes.length-1]
-      if codes[i] == code
-        codes.splice(i, 1)
-        return true
-    return false
+  # Collection
+  Stocks = Backbone.Collection.extend
+    model: Stock
+      
+    load: ->
+      codes = JSON.parse(localStorage.getItem("codes")) || []
+      _.each(codes, (element, index, list) ->
+        this.add(new Stock(element))
+      this)
+      
+    save: ->
+      codes = @get_codes()
+      localStorage.setItem("codes", JSON.stringify(codes))
 
-  # コードをロード
-  load_codes = ->
-    codes = JSON.parse(localStorage.getItem("codes")) || []
-    return
-    
-  # コードを保存
-  save_codes = ->
-    localStorage.setItem("codes", JSON.stringify(codes))
-    return
-    
-  # 銘柄情報
-  get_stocks = ->
-    $.ajax
-      type: "GET"
-      url: "/api/stocks/#{codes.join(',')}"
-      dataType: "json"
-      success: (data, status, xhr) ->
-        stocks = data
-        render()
-    return
+    get_codes: ->    
+      codes = []
+      _.each(@models, (element, index, list) ->
+        codes.push(element.code)
+      )
+      return codes
+      
+    get_stocks: ->
+      codes = @get_codes()
+      $.ajax
+        context: this
+        type: "GET"
+        url: "/api/stocks/#{codes.join(',')}"
+        dataType: "json"
+        success: (data, status, xhr) ->
+          _.each(@models, (model, index, list) ->
+            d = data[model.code]
+            if d
+              model.price = d.price
+              model.name = d.name
+              model.date = d.date
+          this)
+          # render?
+      return
               
   # View
-  render = ->
-    tbody = $("#code_rows")
-    tbody.empty()
-    for code in codes
-      stock = stocks[code] || {name: "-"}
+  StockView = Backbone.View.extend
+    tagName: 'tr'
+
+    initialize: ->
+      @listenTo(@model, 'change', @change)
+      @listenTo(@model, 'remove', @remove)
+
+    template: _.template("<td><%= code %></td><td><%= name %></td><td><%= price %></td><td><%= date %></td><button class='delete btn btn-danger'>削除</button>")
+
+    events:
+      'click .delete': 'destroy'
+
+    destroy: ->
+      if (confirm('are you sure?'))
+        @model.destroy
+        
+    render: ->
+      html = @template(@model.toJSON())
+      @$el.html(html)      
+      this
       
-      tr = $("<tr></tr>").appendTo(tbody)
+  StocksView = Backbone.View.extend
+    el: "#code_rows"
+    
+    render: ->
+      @collection.each((stock) ->
+        stockView = new StockView({model: stock})
+        @$el.append(stockView.render().el)
+      this)
+      return this
+
+  AddStockView = Backbone.View.extend
+    el: "#add_code_form"
+
+    events:
+      'click #add_code': 'add_code'
+      'keypress #add_code_form': 'keypress'
       
-      $("<td></td>").text(code).appendTo(tr)
-      $("<td></td>").text(stock.name).appendTo(tr)
-      $("<td></td>").text(stock.price).appendTo(tr)
-      $("<td></td>").text(stock.date).appendTo(tr)
+    keypress: (e) ->
+      if (e.witch == 13 || e.keyCode == 13)
+        add_code(e)
+        return false
+      else
+        return true
+        
+    add_code: (e) ->
+      e.preventDefault()
       
-      del = $("<button class='btn btn-danger'>削除</button>")
-      # code の値をイベントハンドラ内で使用するため、クロージャにする
-      do (code) ->
-        del.on "click", ->
-          on_remove_code(code)
-          return
-        return
-      $("<td></td>").append(del).appendTo(tr)
-    return
-    
-  # コード追加
-  on_add_code = ->
-    code = $("#code_field").val()
-    $("#code_field").val("")
-    if /^\d\d\d\d$/.test(code)
-      if add_code(code)
-        save_codes()
-        render()
-        get_stocks()
-    else
-      alert("コードは4桁の整数で入力してください")
-    return
-    
-  # コード削除
-  on_remove_code = (code) ->
-    if remove_code(code)
-      save_codes()
-      render()
-    return
-    
+      code = $("#code_field").val()
+      $("#code_field").val("")
+      
+      if /^\d\d\d\d$/.test(code)
+        if add_code(code)
+          stock = new Stock({code: code})
+          @collection.add(stock)
+          @collection.save()
+          @collection.get_stocks()
+      else
+        alert("コードは4桁の整数で入力してください")
+
   # OFX ダウンロード
   download_ofx = ->
-    url = "/downloads/ofx?codes=" + codes.join(",")
+    url = "/downloads/ofx?codes=" + stocks.get_codes().join(",")
     location.href = url
     return
     
-  # イベントハンドラ設定
-  $("#add_code").on "click", on_add_code
-
   $("#download_ofx").on "click", download_ofx
+
+  stocks = new Stocks()
+  stocksView = new StocksView({collection: tasks})
+  addStockView = new AddStockView({collection: tasks})  
+
+  stocks.load()
+  stocks.get_stocks()
   
-  # Enter キー処理
-  $("#add_code_form").keypress (ev) ->
-    if (ev.witch == 13 || ev.keyCode == 13)
-      on_add_code()
-      return false
-    else
-      return true
 
   # 初期化
   load_codes()

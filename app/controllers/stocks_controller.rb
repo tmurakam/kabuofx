@@ -10,18 +10,18 @@ class StocksController < ApplicationController
   # API : 情報取得
   def api_index
     codes = params[:codes].split(/,/)
-    json = {}
+    @json = {}
 
     codes.each do |code|
-      @stock = Stock.where(:code => code).first
-      if @stock
-        json[@stock.code] = {
-          :name => @stock.name,
-          :price => @stock.price,
-          :date => @stock.lastdate
+      stock = Stock.where(:code => code).first
+      if stock
+        @json[stock.code] = {
+          :name => stock.name,
+          :price => stock.price,
+          :date => stock.lastdate
         }
       end
     end
-    render :json => json
+    render :json => @json
   end
 end

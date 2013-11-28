@@ -41,11 +41,11 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 
 # Use Capistrano for deployment
 group :development do
-  gem 'capistrano', '~> 2.15'
-  #gem 'capistrano-rails'
-  #gem 'capistrano-bundler'
-  gem 'capistrano_database_yml'
-  gem 'capistrano_colors'
+  gem 'capistrano', '~> 3'
+  gem 'capistrano-rails'
+  gem 'capistrano-bundler'
+  #gem 'capistrano_database_yml'
+  #gem 'capistrano_colors'
 end
 
 #----------------------------------------------------

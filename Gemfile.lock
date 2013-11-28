@@ -215,7 +215,7 @@ DEPENDENCIES
   better_errors
   bootstrap-sass
   builder
-  capistrano
+  capistrano (~> 2.15)
   capistrano_colors
   capistrano_database_yml
   coffee-rails (~> 4.0.0)

@@ -1,44 +1,42 @@
-require 'bundler/capistrano'
+set :application, 'kabuofx'
+set :repo_url, 'https://github.com/tmurakam/kabuofx.git'
 
+# ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }
+
+set :deploy_to, '/home/rails/kabuofx'
 set :scm, :git
-set :user, "rails"
-set :use_sudo, false
 
-set :application, "kabuofx"
-set :repository,  "https://github.com/tmurakam/kabuofx.git"
+# set :format, :pretty
+# set :log_level, :debug
+# set :pty, true
 
-set :branch, :master
-set :deploy_to, "/home/rails/kabuofx"
+set :linked_files, %w{config/database.yml}
+set :linked_dirs, %w{log public/ofx}
+# set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
 
-role :web, "localhost"                          # Your HTTP server, Apache/etc
-role :app, "localhost"                          # This may be the same as your `Web` server
-role :db,  "localhost", :primary => true # This is where Rails migrations will run
-role :db,  "localhost"
+# set :default_env, { path: "/opt/ruby/bin:$PATH" }
+# set :keep_releases, 5
 
-
-after "deploy:update_code", "db:symlink"
-before "deploy:assets:precompile", "db:symlink"
-
-namespace :db do
-  desc "create symlink to database.yml"
-  task :symlink do
-    run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
-    run "/bin/rm -rf #{release_path}/public/ofx"
-    run "ln -nfs #{shared_path}/ofx #{release_path}/public/ofx"
-  end
-end
-
-# if you want to clean up old releases on each deploy uncomment this:
-# after "deploy:restart", "deploy:cleanup"
-
-# if you're still using the script/reaper helper you will need
-# these http://github.com/rails/irs_process_scripts
-
-# If you are using Passenger mod_rails uncomment this:
 namespace :deploy do
-  task :start do ; end
-  task :stop do ; end
-  task :restart, :roles => :app, :except => { :no_release => true } do
-    run "#{try_sudo} touch #{File.join(current_path,'tmp','restart.txt')}"
+
+  desc 'Restart application'
+  task :restart do
+    on roles(:app), in: :sequence, wait: 5 do
+      # Your restart mechanism here, for example:
+      execute :mkdir, '-p', release_path.join('tmp')
+      execute :touch, release_path.join('tmp/restart.txt')
+    end
   end
+
+  after :restart, :clear_cache do
+    on roles(:web), in: :groups, limit: 3, wait: 10 do
+      # Here we can do anything such as:
+      # within release_path do
+      #   execute :rake, 'cache:clear'
+      # end
+    end
+  end
+
+  after :finishing, 'deploy:cleanup'
+
 end

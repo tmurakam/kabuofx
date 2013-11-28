@@ -49,7 +49,7 @@ group :development do
 end
 
 #----------------------------------------------------
-gem 'bootstrap-sass'
+gem 'bootstrap-sass', '~> 2'
 gem 'simple_form'
 gem 'kaminari'
 

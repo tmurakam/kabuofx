@@ -1,3 +1,5 @@
+require 'bundler/capistrano'
+
 set :scm, :git
 set :user, "rails"
 set :use_sudo, false

@@ -4,6 +4,11 @@ require 'open-uri'
 
 # 株価取得
 class DownloadStocks
+  # rails4_runner 用
+  def execute
+    download
+  end
+
   # 株価情報をダウンロードする
   def download
     #旧URL
@@ -14,12 +19,20 @@ class DownloadStocks
     today = Date.today
     url = "http://k-db.com/stocks/#{today.to_s}?download=csv"
 
-    open(url, 'r:Shift_JIS') do |data|
-      csv = data.read
-      import_csv(csv, today)
+    begin
+      open(url, 'r:Shift_JIS') do |data|
+        csv = data.read
+        import_csv(csv, today)
+      end
+    rescue
+      puts "url open failed"
+      exit 1
     end
 
     OfxGen.new.generate_all
+
+    STDERR.puts "Done!"
+
     return # no return value
   end
 
@@ -27,6 +40,7 @@ class DownloadStocks
 
   # 株価 CSV ファイルをパースし、データを保存
   def import_csv(csv, date)
+
     ActiveRecord::Base::transaction() do
       lineno = 0
       #date = nil

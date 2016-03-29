@@ -6,7 +6,8 @@ require 'open-uri'
 class DownloadStocks
   # 株価情報をダウンロードする
   def download
-    url = "http://k-db.com/site/download.aspx?p=all&download=csv"
+    #url = "http://k-db.com/site/download.aspx?p=all&download=csv"
+    url = "http://k-db.com/?p=all&download=csv"
     open(url, 'r:Shift_JIS') do |data|
       csv = data.read
       import_csv(csv)

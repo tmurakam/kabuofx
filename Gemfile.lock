@@ -108,7 +108,7 @@ GEM
     mime-types (1.25.1)
     minitest (4.7.5)
     multi_json (1.11.2)
-    mysql2 (0.4.2)
+    mysql2 (0.3.20)
     nenv (0.2.0)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
@@ -228,7 +228,7 @@ DEPENDENCIES
   jbuilder (~> 1.2)
   jquery-rails
   kaminari
-  mysql2
+  mysql2 (~> 0.3.20)
   rails (= 4.0.0)
   rspec-rails
   sass-rails (~> 4.0.0)
@@ -240,6 +240,3 @@ DEPENDENCIES
   turbolinks
   uglifier (>= 1.3.0)
   whenever
-
-BUNDLED WITH
-   1.11.2

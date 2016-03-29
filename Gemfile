@@ -5,7 +5,7 @@ gem 'rails', '4.0.0'
 
 # database for Active Record
 gem 'sqlite3'
-gem 'mysql2', platforms: :ruby
+gem 'mysql2', '~> 0.3.20', platforms: :ruby
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.0'

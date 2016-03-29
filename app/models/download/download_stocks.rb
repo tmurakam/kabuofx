@@ -8,7 +8,7 @@ class DownloadStocks
   def download
     #url = "http://k-db.com/site/download.aspx?p=all&download=csv"
     url = "http://k-db.com/?p=all&download=csv"
-    open(url, 'r:Shift_JIS') do |data|
+    open(url, 'r:Shift_JIS', "User-Agent" => "Mozilla/5.0") do |data|
       csv = data.read
       import_csv(csv)
     end
@@ -21,6 +21,8 @@ class DownloadStocks
 
   # 株価 CSV ファイルをパースし、データを保存
   def import_csv(csv)
+    STDERR.puts "importing CSV"
+
     ActiveRecord::Base::transaction() do
       lineno = 0
       date = nil
@@ -31,6 +33,7 @@ class DownloadStocks
         if (lineno == 1)
           # 日付を取得する
           date = Date.parse(cols[0])
+          STDERR.puts "Date = #{date}"
           next
         end
 
@@ -51,6 +54,7 @@ class DownloadStocks
         # コードチェック
         if code =~ /(\d\d\d\d)-T/
           code = $1
+          #STDERR.puts "code = #{code}"
         else
           next
         end

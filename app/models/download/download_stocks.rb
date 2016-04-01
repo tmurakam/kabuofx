@@ -14,16 +14,10 @@ class DownloadStocks
     #旧URL
     #url = "http://k-db.com/site/download.aspx?p=all&download=csv"
 
-    ## Method 1
+    ## Method 1: こちらはフォーマットが異なる
     #url = "http://k-db.com/?p=all&download=csv"
-    #open(url, 'r:Shift_JIS', "User-Agent" => "Mozilla/5.0") do |data|
-    #  csv = data.read
-    #  import_csv(csv)
-    #end
 
     ## Method 2
-    #now = Time.now
-    #today = now.strftime("%Y-%m-%d")
     today = Date.today
     url = "http://k-db.com/stocks/#{today.to_s}?download=csv"
 
@@ -32,8 +26,8 @@ class DownloadStocks
         csv = data.read
         import_csv(csv, today)
       end
-    rescue
-      puts "url open failed"
+    rescue => e
+      puts "download failed : #{e}"
       exit 1
     end
 
@@ -58,9 +52,8 @@ class DownloadStocks
 
         # 1行目
         if (lineno == 1)
-          # 日付を取得する
-          date = Date.parse(cols[0])
-          STDERR.puts "Date = #{date}"
+          # 日付
+          STDERR.puts "Date = #{cols[0]}"
           next
         end
 
@@ -69,7 +62,7 @@ class DownloadStocks
           if (cols.length != 10 || cols[0] != "コード" ||
           cols[2] != "銘柄名" ||
               cols[7] != "終値")
-            throw "Invalid CSV file format (2nd line"
+            throw "Invalid CSV file format (2nd line)"
           end
           next
         end
@@ -78,7 +71,9 @@ class DownloadStocks
         code = cols[0]
         name = cols[2]
         price = cols[7].to_f
-        
+
+        #STDERR.puts "#{code}, #{name}, #{price}" #debug
+
         # コードチェック
         if code =~ /(\d\d\d\d)-T/
           code = $1
